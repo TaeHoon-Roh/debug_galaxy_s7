@@ -8,6 +8,8 @@ Target Fx3 image upload
 
 Usb Init - complete
 
+Usb kernel driver - complete
+
 Usb Claim InterFace - complete
 
 Usb Open - try
