@@ -1,8 +1,9 @@
 //
 // Created by root on 17. 11. 22.
 //
-
+#include "native-lib.h"
 #include "usb_device.h"
+#include "usbi_backend.h"
 
 int libusb_claim_interface(libusb_device_handle *dev, int interface_number){
     int r = 0;
@@ -14,7 +15,7 @@ int libusb_claim_interface(libusb_device_handle *dev, int interface_number){
     if (dev->claimed_interfaces & (1 << interface_number))
         goto out;
 
-    r = usbi_backend.claim_interface(dev, interface_number);
+    r = op_claim_interface(dev, interface_number);
     if (r == 0)
         dev->claimed_interfaces |= 1 << interface_number;
 

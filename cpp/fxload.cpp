@@ -39,7 +39,8 @@ void fxload(){
     status = libusb_init(NULL);
     //libusb_set_auto_detach_kernel_driver -> delete funtion
     device->auto_detach_kernel_driver = 1;
-    status =
+    status = libusb_claim_interface(device, 0);
+
 
 
 }

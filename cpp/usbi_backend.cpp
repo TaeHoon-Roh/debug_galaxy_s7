@@ -4,6 +4,7 @@
 
 #include "native-lib.h"
 #include "usbi_backend.h"
+#include <sys/ioctl.h>
 
 
 char *usbfs_path = NULL;
@@ -181,8 +182,13 @@ int op_exit(){
     return 0;
 }
 
+
+struct _device_handle_priv * device_handle_priv(struct libusb_device_handle *handle){
+    return (_device_handle_priv *)handle->os_priv;
+}
+
 int op_claim_interface(libusb_device_handle *handle, int iface){
-    int fd = _device_handle_priv(handle)->fd;
+    int fd = device_handle_priv(handle)->fd;
     int r = ioctl(fd, IOCTL_USBFS_CLAIMINTF, &iface);
     if (r) {
         if (errno == ENOENT)
@@ -192,8 +198,6 @@ int op_claim_interface(libusb_device_handle *handle, int iface){
         else if (errno == ENODEV)
             return LIBUSB_ERROR_NO_DEVICE;
 
-        usbi_err(HANDLE_CTX(handle),
-                 "claim interface failed, error %d errno %d", r, errno);
         return LIBUSB_ERROR_OTHER;
     }
     return 0;

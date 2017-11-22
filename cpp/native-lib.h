@@ -51,6 +51,7 @@ typedef struct {
 }
 void fxload();
 int libusb_init(struct libusb_context **context);
+int libusb_claim_interface(libusb_device_handle *dev, int interface_number);
 
 #define FIRMWARE 0
 #define LOADER 1
