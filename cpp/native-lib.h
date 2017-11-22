@@ -51,6 +51,7 @@ typedef struct {
 }
 void fxload();
 int libusb_init(struct libusb_context **context);
+int libusb_set_auto_detach_kernel_driver(libusb_device_handle *dev_handle, int enable);
 int libusb_claim_interface(libusb_device_handle *dev, int interface_number);
 
 #define FIRMWARE 0

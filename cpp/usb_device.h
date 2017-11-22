@@ -13,6 +13,12 @@
 #define USB_MAXINTERFACES	32
 #define USB_MAXCONFIG		8
 
+/* Backend specific capabilities */
+#define USBI_CAP_HAS_HID_ACCESS			0x00010000
+#define USBI_CAP_SUPPORTS_DETACH_KERNEL_DRIVER	0x00020000
+
+uint32_t caps_backend = 0;
+
 enum libusb_error {
     /** Success (no error) */
             LIBUSB_SUCCESS = 0,

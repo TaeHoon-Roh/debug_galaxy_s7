@@ -36,10 +36,18 @@ void fxload(){
     type = "fx3";
 
     //open device
+    //step 1
     status = libusb_init(NULL);
+
+    //step 2 fix please
+    //device = libusb_open_device_with_vid_pid(NULL, (uint16_t)vid,(uint16_t)pid);
+
+    //step 3
     //libusb_set_auto_detach_kernel_driver -> delete funtion
-    device->auto_detach_kernel_driver = 1;
-    status = libusb_claim_interface(device, 0);
+
+    libusb_set_auto_detach_kernel_driver(device, 0);
+    //status = libusb_claim_interface(device, 0);
+
 
 
 
