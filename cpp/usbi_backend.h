@@ -11,14 +11,66 @@
 
 #define IOCTL_USBFS_CLAIMINTF	_IOR('U', 15, unsigned int)
 struct _device_handle_priv {
+
     int fd;
     int fd_removed;
     uint32_t caps;
 };
 
+struct linux_device_priv{
+
+    char *sysfs_dir;
+    unsigned char *dev_descriptor;
+    unsigned char *config_descriptor;
+    int descriptors_len;
+    int active_config;
+};
 
 int op_init(struct libusb_context *ctx);
 int op_exit();
 int op_claim_interface(libusb_device_handle *handle, int iface);
+
+//usb_open
+int op_get_device_list(libusb_context *ctx, discovered_devs **_discdevs);
+
+
+//usb_open -> inline funtion
+inline void list_add(list_head *entry, list_head *head) {
+
+    entry->next = head->next;
+    entry->prev = head;
+
+    head->next->prev = entry;
+    head->next = entry;
+}
+
+inline void list_add_tail(list_head *entry, list_head *head) {
+
+    entry->next = head;
+    entry->prev = head->prev;
+
+    head->prev->next = entry;
+    head->prev = entry;
+}
+
+inline void list_del(list_head *entry) {
+
+    entry->next->prev = entry->prev;
+    entry->prev->next = entry->next;
+}
+
+void libusb_unref_device(libusb_device *dev);
+
+libusb_device *libusb_ref_device(libusb_device *dev);
+
+int op_get_device_descriptor(libusb_device *dev, unsigned char *buffer, int *host_endian);
+
+int op_get_device_list(libusb_context *ctx, discovered_devs **_discdevs);
+
+#define DEVICE_DESC_LENGTH		18
+
+#define DEVICE_CTX(dev) ((dev)->ctx)
+
+size_t device_handle_priv_size();
 
 #endif //KOREAPASSING_USBI_BACKEND_H

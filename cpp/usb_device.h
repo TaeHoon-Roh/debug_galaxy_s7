@@ -259,4 +259,118 @@ struct libusb_context {
 };
 
 
+//device open header
+
+struct discovered_devs {
+    size_t len;
+    size_t capacity;
+    struct libusb_device *devices[0];
+};
+
+#define DISCOVERED_DEVICES_SIZE_STEP 8
+
+struct libusb_context *usbi_default_context = NULL;
+#define USBI_GET_CONTEXT(ctx) if (!(ctx)) (ctx) = usbi_default_context
+
+struct usbfs_ctrltransfer {
+    /* keep in sync with usbdevice_fs.h:usbdevfs_ctrltransfer */
+    uint8_t  bmRequestType;
+    uint8_t  bRequest;
+    uint16_t wValue;
+    uint16_t wIndex;
+    uint16_t wLength;
+
+    uint32_t timeout;	/* in milliseconds */
+
+    /* pointer to data */
+    void *data;
+};
+
+enum libusb_endpoint_direction {
+    /** In: device-to-host */
+            LIBUSB_ENDPOINT_IN = 0x80,
+
+    /** Out: host-to-device */
+            LIBUSB_ENDPOINT_OUT = 0x00
+};
+
+enum libusb_standard_request {
+    /** Request status of the specific recipient */
+            LIBUSB_REQUEST_GET_STATUS = 0x00,
+
+    /** Clear or disable a specific feature */
+            LIBUSB_REQUEST_CLEAR_FEATURE = 0x01,
+
+    /* 0x02 is reserved */
+
+    /** Set or enable a specific feature */
+            LIBUSB_REQUEST_SET_FEATURE = 0x03,
+
+    /* 0x04 is reserved */
+
+    /** Set device address for all future accesses */
+            LIBUSB_REQUEST_SET_ADDRESS = 0x05,
+
+    /** Get the specified descriptor */
+            LIBUSB_REQUEST_GET_DESCRIPTOR = 0x06,
+
+    /** Used to update existing descriptors or add new descriptors */
+            LIBUSB_REQUEST_SET_DESCRIPTOR = 0x07,
+
+    /** Get the current device configuration value */
+            LIBUSB_REQUEST_GET_CONFIGURATION = 0x08,
+
+    /** Set device configuration */
+            LIBUSB_REQUEST_SET_CONFIGURATION = 0x09,
+
+    /** Return the selected alternate setting for the specified interface */
+            LIBUSB_REQUEST_GET_INTERFACE = 0x0A,
+
+    /** Select an alternate interface for the specified interface */
+            LIBUSB_REQUEST_SET_INTERFACE = 0x0B,
+
+    /** Set then report an endpoint's synchronization frame */
+            LIBUSB_REQUEST_SYNCH_FRAME = 0x0C,
+};
+
+#define IOCTL_USBFS_CONTROL	_IOWR('U', 0, usbfs_ctrltransfer)
+
+struct libusb_config_descriptor {
+
+    uint8_t  bLength;
+
+    uint8_t  bDescriptorType;
+
+    uint16_t wTotalLength;
+
+    uint8_t  bNumInterfaces;
+
+    uint8_t  bConfigurationValue;
+
+    uint8_t  iConfiguration;
+
+    uint8_t  bmAttributes;
+
+    uint8_t  MaxPower;
+
+    const struct libusb_interface *interface;
+
+    const unsigned char *extra;
+
+    int extra_length;
+};
+
+inline uint16_t libusb_cpu_to_le16(const uint16_t x) {
+
+    union {
+        uint8_t  b8[2];
+        uint16_t b16;
+    } _tmp;
+    _tmp.b8[1] = x >> 8;
+    _tmp.b8[0] = x & 0xff;
+    return _tmp.b16;
+}
+
+#define libusb_le16_to_cpu libusb_cpu_to_le16
+
 #endif //KOREAPASSING_USB_DEVICE_H

@@ -10,9 +10,9 @@ Usb Init - complete
 
 Usb kernel driver - complete
 
-Usb Claim InterFace - complete
+Usb Claim InterFace - complete - fix
 
-Usb Open - try
+Usb Open - try, try check usb_open line number 114, 129, 164
 
 Usb Release
 

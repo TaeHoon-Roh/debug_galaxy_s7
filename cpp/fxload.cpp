@@ -40,7 +40,7 @@ void fxload(){
     status = libusb_init(NULL);
 
     //step 2 fix please
-    //device = libusb_open_device_with_vid_pid(NULL, (uint16_t)vid,(uint16_t)pid);
+    device = libusb_open_device_with_vid_pid(NULL, (uint16_t)vid,(uint16_t)pid);
 
     //step 3
     //libusb_set_auto_detach_kernel_driver -> delete funtion

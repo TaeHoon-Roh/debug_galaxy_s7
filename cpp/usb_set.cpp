@@ -33,3 +33,11 @@ int libusb_set_auto_detach_kernel_driver(libusb_device_handle *dev_handle, int e
     dev_handle->auto_detach_kernel_driver = enable;
     return LIBUSB_SUCCESS;
 }
+
+libusb_device *libusb_ref_device(libusb_device *dev) {
+
+    usbi_mutex_lock(&dev->lock);
+    dev->refcnt++;
+    usbi_mutex_unlock(&dev->lock);
+    return dev;
+}

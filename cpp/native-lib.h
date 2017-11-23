@@ -10,6 +10,21 @@
 #include <jni.h>
 #include "usb_device.h"
 #include "thread.h"
+#include <android/log.h>
+
+
+//Android Log
+#define  LOG_TAG    "FXLOAD"
+#define  LOGUNK(...)  __android_log_print(ANDROID_LOG_UNKNOWN,LOG_TAG,__VA_ARGS__)
+#define  LOGDEF(...)  __android_log_print(ANDROID_LOG_DEFAULT,LOG_TAG,__VA_ARGS__)
+#define  LOGV(...)  __android_log_print(ANDROID_LOG_VERBOSE,LOG_TAG,__VA_ARGS__)
+#define  LOGD(...)  __android_log_print(ANDROID_LOG_DEBUG,LOG_TAG,__VA_ARGS__)
+#define  LOGI(...)  __android_log_print(ANDROID_LOG_INFO,LOG_TAG,__VA_ARGS__)
+#define  LOGW(...)  __android_log_print(ANDROID_LOG_WARN,LOG_TAG,__VA_ARGS__)
+#define  LOGE(...)  __android_log_print(ANDROID_LOG_ERROR,LOG_TAG,__VA_ARGS__)
+#define  LOGF(...)  __android_log_print(ANDROID_FATAL_ERROR,LOG_TAG,__VA_ARGS__)
+#define  LOGS(...)  __android_log_print(ANDROID_SILENT_ERROR,LOG_TAG,__VA_ARGS__)
+
 
 #define FX_TYPE_UNDEFINED  -1
 #define FX_TYPE_AN21       0	/* Original AnchorChips parts */
@@ -51,8 +66,11 @@ typedef struct {
 }
 void fxload();
 int libusb_init(struct libusb_context **context);
+int libusb_open_device_with_vid_pid(libusb_context *ctx, uint16_t vendor_id, uint16_t product_id);
 int libusb_set_auto_detach_kernel_driver(libusb_device_handle *dev_handle, int enable);
 int libusb_claim_interface(libusb_device_handle *dev, int interface_number);
+
+
 
 #define FIRMWARE 0
 #define LOADER 1
