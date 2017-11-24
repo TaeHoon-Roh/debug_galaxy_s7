@@ -11,6 +11,15 @@
 #include <sys/time.h>
 #endif
 
+/*#if (!defined(HAVE_STRUCT_TIMESPEC) && !defined(_TIMESPEC_DEFINED))
+#define HAVE_STRUCT_TIMESPEC 1
+#define _TIMESPEC_DEFINED 1
+struct timespec {
+    long tv_sec;
+    long tv_nsec;
+};
+#endif *//* HAVE_STRUCT_TIMESPEC | _TIMESPEC_DEFINED */
+
 #define usbi_mutex_static_t        pthread_mutex_t
 #define USBI_MUTEX_INITIALIZER        PTHREAD_MUTEX_INITIALIZER
 #define usbi_mutex_static_lock        pthread_mutex_lock

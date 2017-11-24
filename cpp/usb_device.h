@@ -258,6 +258,16 @@ struct libusb_context {
 
 };
 
+struct libusb_pollfd {
+    int fd;
+    short events;
+};
+
+struct usbi_pollfd {
+
+    libusb_pollfd pollfd;
+    list_head list;
+};
 
 //device open header
 
@@ -270,6 +280,7 @@ struct discovered_devs {
 #define DISCOVERED_DEVICES_SIZE_STEP 8
 
 struct libusb_context *usbi_default_context = NULL;
+
 #define USBI_GET_CONTEXT(ctx) if (!(ctx)) (ctx) = usbi_default_context
 
 struct usbfs_ctrltransfer {
@@ -370,6 +381,8 @@ inline uint16_t libusb_cpu_to_le16(const uint16_t x) {
     _tmp.b8[0] = x & 0xff;
     return _tmp.b16;
 }
+
+
 
 #define libusb_le16_to_cpu libusb_cpu_to_le16
 

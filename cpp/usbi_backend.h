@@ -8,6 +8,7 @@
 #include <sys/utsname.h>
 #include <dirent.h>
 #include "usb_device.h"
+#include "usb_init.h"
 
 #define IOCTL_USBFS_CLAIMINTF	_IOR('U', 15, unsigned int)
 struct _device_handle_priv {
@@ -25,6 +26,8 @@ struct linux_device_priv{
     int descriptors_len;
     int active_config;
 };
+
+
 
 int op_init(struct libusb_context *ctx);
 int op_exit();
@@ -70,7 +73,14 @@ int op_get_device_list(libusb_context *ctx, discovered_devs **_discdevs);
 #define DEVICE_DESC_LENGTH		18
 
 #define DEVICE_CTX(dev) ((dev)->ctx)
+#define HANDLE_CTX(handle) (DEVICE_CTX((handle)->dev))
 
 size_t device_handle_priv_size();
+
+int op_open(libusb_device_handle *handle);
+void usbi_fd_notification(libusb_context *ctx);
+
+#define usbi_write write
+#define usbi_read read
 
 #endif //KOREAPASSING_USBI_BACKEND_H

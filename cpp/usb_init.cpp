@@ -2,40 +2,10 @@
 // Created by root on 17. 11. 20.
 //
 
-#include "native-lib.h"
-#include "usbi_backend.h"
-#include "thread.h"
-#include <unistd.h>
+#include "usb_init.h"
 
-static usbi_mutex_static_t default_context_lock = USBI_MUTEX_INITIALIZER;
-static struct timeval timestamp_origin = {0, 0};
-struct libusb_context *usbi_default_context = NULL;
-static int default_context_refcnt = 0;
+int usbi_add_pollfd(libusb_context *ctx, int fd, short events) {
 
-#define usbi_pipe pipe
-
-struct libusb_pollfd {
-    int fd;
-    short events;
-};
-
-struct usbi_pollfd {
-    struct libusb_pollfd pollfd;
-    struct list_head list;
-};
-
-static inline void list_add_tail(struct list_head *entry,
-                                 struct list_head *head)
-{
-    entry->next = head;
-    entry->prev = head->prev;
-
-    head->prev->next = entry;
-    head->prev = entry;
-}
-
-int usbi_add_pollfd(struct libusb_context *ctx, int fd, short events)
-{
     struct usbi_pollfd *ipollfd = (usbi_pollfd *) malloc(sizeof(*ipollfd));
     if (!ipollfd)
         return LIBUSB_ERROR_NO_MEM;
@@ -55,9 +25,8 @@ int usbi_add_pollfd(struct libusb_context *ctx, int fd, short events)
 }
 
 
+int usbi_mutex_init_recursive(pthread_mutex_t *mutex, pthread_mutexattr_t *attr) {
 
-int usbi_mutex_init_recursive(pthread_mutex_t *mutex, pthread_mutexattr_t *attr)
-{
     int err;
     pthread_mutexattr_t stack_attr;
     if (!attr) {
@@ -80,13 +49,8 @@ int usbi_mutex_init_recursive(pthread_mutex_t *mutex, pthread_mutexattr_t *attr)
     return err;
 }
 
-static inline void list_init(struct list_head *entry)
-{
-    entry->prev = entry->next = entry;
-}
+int usbi_io_init(libusb_context *ctx) {
 
-int usbi_io_init(struct libusb_context *ctx)
-{
     int r;
 
     usbi_mutex_init(&ctx->flying_transfers_lock, NULL);
@@ -140,7 +104,8 @@ int usbi_io_init(struct libusb_context *ctx)
     return r;
 }
 
-int libusb_init(struct libusb_context **context) {
+int libusb_init(libusb_context **context) {
+
     struct libusb_context *ctx;
     int r = 0;
 

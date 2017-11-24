@@ -66,7 +66,7 @@ typedef struct {
 }
 void fxload();
 int libusb_init(struct libusb_context **context);
-int libusb_open_device_with_vid_pid(libusb_context *ctx, uint16_t vendor_id, uint16_t product_id);
+libusb_device_handle * libusb_open_device_with_vid_pid(libusb_context *ctx, uint16_t vendor_id, uint16_t product_id);
 int libusb_set_auto_detach_kernel_driver(libusb_device_handle *dev_handle, int enable);
 int libusb_claim_interface(libusb_device_handle *dev, int interface_number);
 

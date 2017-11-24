@@ -158,7 +158,7 @@ int op_exit() {
 }
 
 
-struct _device_handle_priv *device_handle_priv(struct libusb_device_handle *handle) {
+struct _device_handle_priv *device_handle_priv(libusb_device_handle *handle) {
 
     return (_device_handle_priv *) handle->os_priv;
 }
@@ -287,7 +287,7 @@ int _open_sysfs_attr(libusb_device *dev, const char *attr) {
              SYSFS_DEVICE_PATH, priv->sysfs_dir, attr);
     fd = open(filename, O_RDONLY);
     if (fd < 0) {
-        LOGD("usbi_backend : _open_sysfs_attr_ open failed");
+        //LOGD("usbi_backend : _open_sysfs_attr_ open failed");
         return LIBUSB_ERROR_IO;
     }
 
@@ -309,25 +309,25 @@ int sysfs_get_active_config(libusb_device *dev, int *config) {
     r = read(fd, tmp, sizeof(tmp));
     close(fd);
     if (r < 0) {
-        LOGE("usbi_backend : sysfs_get_active_config - read bConfigurationValue failed");
+        //LOGE("usbi_backend : sysfs_get_active_config - read bConfigurationValue failed");
         return LIBUSB_ERROR_IO;
     } else if (r == 0) {
-        LOGE("usbi_backend : sysfs_get_active_config - device unconfigured");
+        //LOGE("usbi_backend : sysfs_get_active_config - device unconfigured");
         *config = -1;
         return 0;
     }
 
     if (tmp[sizeof(tmp) - 1] != 0) {
-        LOGE("usbi_backend : sysfs_get_active_config - not null-terminated?");
+        //LOGE("usbi_backend : sysfs_get_active_config - not null-terminated?");
         return LIBUSB_ERROR_IO;
     } else if (tmp[0] == 0) {
-        LOGE("usbi_backend : sysfs_get_active_config - no configuration value?");
+        //LOGE("usbi_backend : sysfs_get_active_config - no configuration value?");
         return LIBUSB_ERROR_IO;
     }
 
     num = strtol(tmp, &endptr, 10);
     if (endptr == tmp) {
-        LOGE("usbi_backend : sysfs_get_active_config - error converting");
+        //LOGE("usbi_backend : sysfs_get_active_config - error converting");
         return LIBUSB_ERROR_IO;
     }
 
@@ -368,8 +368,8 @@ int usbfs_get_active_config(libusb_device *dev, int fd) {
             return LIBUSB_ERROR_NO_DEVICE;
 
         /* we hit this error path frequently with buggy devices :( */
-        LOGW("usbi_backend : usbfs_get_active_config - get_configuration failed ret=%d errno=%d", r,
-             errno);
+        /*LOGW("usbi_backend : usbfs_get_active_config - get_configuration failed ret=%d errno=%d", r,
+             errno);*/
         return LIBUSB_ERROR_IO;
     }
 
@@ -415,17 +415,17 @@ int seek_to_next_config(libusb_context *ctx, int fd, int host_endian) {
 
     r = read(fd, tmp, sizeof(tmp));
     if (r < 0) {
-        LOGE("usbi_backend : seek_to_next_config - read failed ret=%d errno=%d", r, errno);
+        //LOGE("usbi_backend : seek_to_next_config - read failed ret=%d errno=%d", r, errno);
         return LIBUSB_ERROR_IO;
     } else if (r < sizeof(tmp)) {
-        LOGE("usbi_backend : seek_to_next_config - short descriptor read %d/%d", r, sizeof(tmp));
+        //LOGE("usbi_backend : seek_to_next_config - short descriptor read %d/%d", r, sizeof(tmp));
         return LIBUSB_ERROR_IO;
     }
 
     usbi_parse_descriptor(tmp, "bbwbb", &config, host_endian);
     off = lseek(fd, config.wTotalLength - sizeof(tmp), SEEK_CUR);
     if (off < 0) {
-        LOGE("usbi_backend : seek_to_next_config - seek failed ret=%d errno=%d", off, errno);
+        //LOGE("usbi_backend : seek_to_next_config - seek failed ret=%d errno=%d", off, errno);
         return LIBUSB_ERROR_IO;
     }
 
@@ -440,7 +440,7 @@ int get_config_descriptor(libusb_context *ctx, int fd, uint8_t config_index, uns
 
     off = lseek(fd, DEVICE_DESC_LENGTH, SEEK_SET);
     if (off < 0) {
-        LOGE("usbi_backend : get_config_descriptor - seek failed ret=%d errno=%d", off, errno);
+        //LOGE("usbi_backend : get_config_descriptor - seek failed ret=%d errno=%d", off, errno);
         return LIBUSB_ERROR_IO;
     }
 
@@ -456,10 +456,10 @@ int get_config_descriptor(libusb_context *ctx, int fd, uint8_t config_index, uns
     /* read the rest of the descriptor */
     r = read(fd, buffer, len);
     if (r < 0) {
-        LOGE("usbi_backend : get_config_descriptor - read failed ret=%d errno=%d", r, errno);
+        //LOGE("usbi_backend : get_config_descriptor - read failed ret=%d errno=%d", r, errno);
         return LIBUSB_ERROR_IO;
     } else if (r < len) {
-        LOGE("usbi_backend : get_config_descriptor - short output read %d/%d", r, len);
+        //LOGE("usbi_backend : get_config_descriptor - short output read %d/%d", r, len);
         return LIBUSB_ERROR_IO;
     }
 
@@ -476,8 +476,8 @@ int op_get_config_descriptor(libusb_device *dev, uint8_t config_index, unsigned 
     _get_usbfs_path(dev, filename);
     fd = open(filename, O_RDONLY);
     if (fd < 0) {
-        LOGE("usbi_backend : get_config_descriptor - open '%s' failed, ret=%d errno=%d", filename,
-             fd, errno);
+        /*LOGE("usbi_backend : get_config_descriptor - open '%s' failed, ret=%d errno=%d", filename,
+             fd, errno);*/
         return LIBUSB_ERROR_IO;
     }
 
@@ -490,7 +490,7 @@ int usbi_get_config_index_by_value(libusb_device *dev, uint8_t bConfigurationVal
 
     uint8_t i;
 
-    LOGD("usbi_backend : usbi_get_config_index_by_value - value %d", bConfigurationValue);
+    //LOGD("usbi_backend : usbi_get_config_index_by_value - value %d", bConfigurationValue);
 
     for (i = 0; i < dev->num_configurations; i++) {
         unsigned char tmp[6];
@@ -529,7 +529,7 @@ int cache_active_config(libusb_device *dev, int fd, int active_config) {
 
     r = get_config_descriptor(DEVICE_CTX(dev), fd, idx, tmp, sizeof(tmp));
     if (r < 0) {
-        LOGE("usbi_backend : cache_active_config - first read error %d", r);
+        //LOGE("usbi_backend : cache_active_config - first read error %d", r);
         return r;
     }
 
@@ -613,31 +613,24 @@ int initialize_device(libusb_device *dev, uint8_t busnum, uint8_t devaddr, const
     }
 
     if (fd < 0) {
-        LOGE("usbi_backend : initialize_device - open failed,");
+        //LOGE("usbi_backend : initialize_device - open failed,");
         return LIBUSB_ERROR_IO;
     }
 
     if (!sysfs_can_relate_devices) {
         if (active_config == -1) {
-            LOGE("usbi_backend : initialize_device - access to %s is read-only; cannot determine active configuration descriptor",
-                 path);
+            /*LOGE("usbi_backend : initialize_device - access to %s is read-only; cannot determine active configuration descriptor",
+                 path);*/
         } else {
             active_config = usbfs_get_active_config(dev, fd);
             if (active_config == LIBUSB_ERROR_IO) {
-                /* buggy devices sometimes fail to report their active config.
-                 * assume unconfigured and continue the probing */
-                LOGW("usbi_backend : initialize_device - couldn't query active configuration, assumung unconfigured");
+                //LOGW("usbi_backend : initialize_device - couldn't query active configuration, assumung unconfigured");
                 device_configured = 0;
             } else if (active_config < 0) {
                 close(fd);
                 return active_config;
             } else if (active_config == 0) {
-                /* some buggy devices have a configuration 0, but we're
-                 * reaching into the corner of a corner case here, so let's
-                 * not support buggy devices in these circumstances.
-                 * stick to the specs: a configuration value of 0 means
-                 * unconfigured. */
-                LOGD("usbi_backend : initialize_device - active cfg 0? assuming unconfigured device");
+                //LOGD("usbi_backend : initialize_device - active cfg 0? assuming unconfigured device");
                 device_configured = 0;
             }
         }
@@ -651,20 +644,18 @@ int initialize_device(libusb_device *dev, uint8_t busnum, uint8_t devaddr, const
 
     r = read(fd, dev_buf, DEVICE_DESC_LENGTH);
     if (r < 0) {
-        LOGE("usbi_backend : initialize_device - read descriptor failed ret=%d errno=%d", fd,
-             errno);
+        /*LOGE("usbi_backend : initialize_device - read descriptor failed ret=%d errno=%d", fd,
+             errno);*/
         free(dev_buf);
         close(fd);
         return LIBUSB_ERROR_IO;
     } else if (r < DEVICE_DESC_LENGTH) {
-        LOGE("usbi_backend : initialize_device - short descriptor read (%d)", r);
+        //LOGE("usbi_backend : initialize_device - short descriptor read (%d)", r);
         free(dev_buf);
         close(fd);
         return LIBUSB_ERROR_IO;
     }
 
-    /* bit of a hack: set num_configurations now because cache_active_config()
-     * calls usbi_get_config_index_by_value() which uses it */
     dev->num_configurations = dev_buf[DEVICE_DESC_LENGTH - 1];
 
     if (device_configured) {
@@ -693,12 +684,12 @@ int sysfs_get_device_descriptor(libusb_device *dev, unsigned char *buffer) {
     r = read(fd, buffer, DEVICE_DESC_LENGTH);;
     close(fd);
     if (r < 0) {
-        LOGE("usbi_backend : sysfs_get_device_descriptor - read failed, ret=%d errno=%d", fd,
-             errno);
+        /*LOGE("usbi_backend : sysfs_get_device_descriptor - read failed, ret=%d errno=%d", fd,
+             errno);*/
         return LIBUSB_ERROR_IO;
     } else if (r < DEVICE_DESC_LENGTH) {
-        LOGE("usbi_backend : sysfs_get_device_descriptor - short read %d/%d", r,
-             DEVICE_DESC_LENGTH);
+        /*LOGE("usbi_backend : sysfs_get_device_descriptor - short read %d/%d", r,
+             DEVICE_DESC_LENGTH);*/
         return LIBUSB_ERROR_IO;
     }
 
@@ -736,10 +727,10 @@ int usbi_sanitize_device(struct libusb_device *dev) {
 
     num_configurations = raw_desc[DEVICE_DESC_LENGTH - 1];
     if (num_configurations > USB_MAXCONFIG) {
-        LOGE("usbi_backend : usbi_sanitize_device - too many configurations");
+        //LOGE("usbi_backend : usbi_sanitize_device - too many configurations");
         return LIBUSB_ERROR_IO;
     } else if (0 == num_configurations)
-        LOGE("usbi_backend : usbi_sanitize_device - zero configurations, maybe an unauthorized device");
+        //LOGE("usbi_backend : usbi_sanitize_device - zero configurations, maybe an unauthorized device");
 
     dev->num_configurations = num_configurations;
     return 0;
@@ -757,7 +748,7 @@ discovered_devs_append(discovered_devs *discdevs, struct libusb_device *dev) {
         return discdevs;
     }
 
-    LOGD("usbi_backend : discovered_devs_append - need to increase capacity");
+    //LOGD("usbi_backend : discovered_devs_append - need to increase capacity");
     capacity = discdevs->capacity + DISCOVERED_DEVICES_SIZE_STEP;
     discdevs = (discovered_devs *) realloc(discdevs,
                                            sizeof(*discdevs) + (sizeof(void *) * capacity));
@@ -795,7 +786,7 @@ void libusb_unref_device(libusb_device *dev) {
     usbi_mutex_unlock(&dev->lock);
 
     if (refcnt == 0) {
-        LOGD("usbi_backend : libusb_unref_device - destroy device %d.%d", dev->bus_number, dev->device_address);
+        //LOGD("usbi_backend : libusb_unref_device - destroy device %d.%d", dev->bus_number, dev->device_address);
 
         op_destroy_device(dev);
 
@@ -906,7 +897,7 @@ int _is_usbdev_entry(dirent *entry, int *bus_p, int *dev_p) {
     if (sscanf(entry->d_name, "usbdev%d.%d", &busnum, &devnum) != 2)
         return 0;
 
-    LOGD("usbi_backend : _is_usbdev_entry - found: %s", entry->d_name);
+    //LOGD("usbi_backend : _is_usbdev_entry - found: %s", entry->d_name);
     if (bus_p != NULL)
         *bus_p = busnum;
     if (dev_p != NULL)
@@ -923,10 +914,10 @@ int usbfs_scan_busdir(libusb_context *ctx, discovered_devs **_discdevs, uint8_t 
     int r = LIBUSB_ERROR_IO;
 
     snprintf(dirpath, PATH_MAX, "%s/%03d", usbfs_path, busnum);
-    LOGD("usbi_backend : usbfs_scan_busdir - %s", dirpath);
+    //LOGD("usbi_backend : usbfs_scan_busdir - %s", dirpath);
     dir = opendir(dirpath);
     if (!dir) {
-        LOGD("usbi_backend : usbfs_scan_busdir - opendir '%s' failed, errno=%d", dirpath, errno);
+        //LOGD("usbi_backend : usbfs_scan_busdir - opendir '%s' failed, errno=%d", dirpath, errno);
         return r;
     }
 
@@ -938,12 +929,12 @@ int usbfs_scan_busdir(libusb_context *ctx, discovered_devs **_discdevs, uint8_t 
 
         devaddr = atoi(entry->d_name);
         if (devaddr == 0) {
-            LOGD("usbi_backend : usbfs_scan_busdir - unknown dir entry %s", entry->d_name);
+            //LOGD("usbi_backend : usbfs_scan_busdir - unknown dir entry %s", entry->d_name);
             continue;
         }
 
         if (enumerate_device(ctx, &discdevs, busnum, (uint8_t) devaddr, NULL)) {
-            LOGD("usbi_backend : usbfs_scan_busdir - failed to enumerate dir entry %s", entry->d_name);
+            //LOGD("usbi_backend : usbfs_scan_busdir - failed to enumerate dir entry %s", entry->d_name);
             continue;
         }
 
@@ -964,7 +955,7 @@ int usbfs_get_device_list(libusb_context *ctx, discovered_devs **_discdevs) {
     int r = 0;
 
     if (!buses) {
-        LOGD("usbi_backend : usbfs_get_device_list - opendir buses failed errno=%d", errno);
+        //LOGD("usbi_backend : usbfs_get_device_list - opendir buses failed errno=%d", errno);
         return LIBUSB_ERROR_IO;
     }
 
@@ -983,13 +974,13 @@ int usbfs_get_device_list(libusb_context *ctx, discovered_devs **_discdevs) {
             r = enumerate_device(ctx, &discdevs_new, busnum,
                                  (uint8_t) devaddr, NULL);
             if (r < 0) {
-                LOGD("usbi_backend : usbfs_get_device_list - failed to enumerate dir entry %s", entry->d_name);
+                //LOGD("usbi_backend : usbfs_get_device_list - failed to enumerate dir entry %s", entry->d_name);
                 continue;
             }
         } else {
             busnum = atoi(entry->d_name);
             if (busnum == 0) {
-                LOGD("usbi_backend : usbfs_get_device_list - unknown dir entry %s", entry->d_name);
+                //LOGD("usbi_backend : usbfs_get_device_list - unknown dir entry %s", entry->d_name);
                 continue;
             }
 
@@ -1018,4 +1009,127 @@ int op_get_device_list(libusb_context *ctx, discovered_devs **_discdevs) {
 size_t device_handle_priv_size(){
 
     return sizeof(_device_handle_priv);
+}
+
+//op_open method
+
+int find_fd_by_name(char *file_name) {
+
+    struct dirent *fd_dirent;
+    DIR *proc_fd = opendir("/proc/self/fd");
+    int ret = -1;
+
+    while (fd_dirent = readdir(proc_fd))
+    {
+        char link_file_name[1024];
+        char fd_file_name[1024];
+
+        if (fd_dirent->d_type != DT_LNK)
+        {
+            continue;
+        }
+
+        snprintf(link_file_name, 1024, "/proc/self/fd/%s", fd_dirent->d_name);
+
+        memset(fd_file_name, 0, sizeof(fd_file_name));
+        readlink(link_file_name, fd_file_name, sizeof(fd_file_name) - 1);
+
+        if (!strcmp(fd_file_name, file_name))
+        {
+            ret = atoi(fd_dirent->d_name);
+        }
+    }
+
+    closedir(proc_fd);
+
+    return ret;
+}
+
+int op_open(libusb_device_handle *handle){
+
+	struct _device_handle_priv *hpriv = device_handle_priv(handle);
+	char filename[PATH_MAX];
+
+	_get_usbfs_path(handle->dev, filename);
+    //LOGD("usbi_backend : op_open - opening %s", filename);
+	// *** PrimeSense patch for Android ***
+	hpriv->fd = find_fd_by_name(filename);
+
+	// Fallback for regular non-java applications
+	if (hpriv->fd == -1)
+	{
+		hpriv->fd = open(filename, O_RDWR);
+	}
+// *** PrimeSense patch for Android ***
+	if (hpriv->fd < 0) {
+		if (errno == EACCES) {
+            /*LOGE("usbi_backend : op_open - libusb couldn't open USB device %s: "
+                         "Permission denied.", filename);*/
+            ////LOGE("usbi_backend : op_open - libusb requires write access to USB device nodes.");
+			return LIBUSB_ERROR_ACCESS;
+		} else if (errno == ENOENT) {
+            /*//LOGE("usbi_backend : op_open - libusb couldn't open USB device %s: "
+                         "No such file or directory.", filename);*/
+			return LIBUSB_ERROR_NO_DEVICE;
+		} else {
+            ////LOGE("usbi_backend : op_open - open failed, code %d errno %d", hpriv->fd, errno);
+			return LIBUSB_ERROR_IO;
+		}
+	}
+
+	return usbi_add_pollfd(HANDLE_CTX(handle), hpriv->fd, POLLOUT);
+}
+
+void libusb_lock_events(libusb_context *ctx) {
+
+    USBI_GET_CONTEXT(ctx);
+    usbi_mutex_lock(&ctx->events_lock);
+    ctx->event_handler_active = 1;
+
+}
+
+void libusb_unlock_events(libusb_context *ctx) {
+
+    USBI_GET_CONTEXT(ctx);
+    ctx->event_handler_active = 0;
+    usbi_mutex_unlock(&ctx->events_lock);
+
+    usbi_mutex_lock(&ctx->event_waiters_lock);
+    usbi_cond_broadcast(&ctx->event_waiters_cond);
+    usbi_mutex_unlock(&ctx->event_waiters_lock);
+}
+
+void usbi_fd_notification(libusb_context *ctx) {
+
+    unsigned char dummy = 1;
+    ssize_t r;
+
+    if (ctx == NULL)
+        return;
+
+    usbi_mutex_lock(&ctx->pollfd_modify_lock);
+    ctx->pollfd_modify++;
+    usbi_mutex_unlock(&ctx->pollfd_modify_lock);
+
+    r = usbi_write(ctx->ctrl_pipe[1], &dummy, sizeof(dummy));
+    if (r <= 0) {
+        //LOGW("usbi_backend : usbi_fd_notification - internal signalling write failed");
+        usbi_mutex_lock(&ctx->pollfd_modify_lock);
+        ctx->pollfd_modify--;
+        usbi_mutex_unlock(&ctx->pollfd_modify_lock);
+        return;
+    }
+
+    libusb_lock_events(ctx);
+
+    /* read the dummy data */
+    r = usbi_read(ctx->ctrl_pipe[0], &dummy, sizeof(dummy));
+    if (r <= 0)
+        //LOGW("usbi_backend : usbi_fd_notification - internal signalling read failed");
+
+    usbi_mutex_lock(&ctx->pollfd_modify_lock);
+    ctx->pollfd_modify--;
+    usbi_mutex_unlock(&ctx->pollfd_modify_lock);
+
+    libusb_unlock_events(ctx);
 }

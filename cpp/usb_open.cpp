@@ -73,7 +73,7 @@ int libusb_get_device_descriptor(libusb_device *dev, libusb_device_descriptor *d
     int host_endian = 0;
     int r;
 
-    LOGD("usb_open : libusb_get_device_descriptor - ");
+    //LOGD("usb_open : libusb_get_device_descriptor - ");
     r = op_get_device_descriptor(dev, raw_desc, &host_endian);
     if (r < 0)
         return r;
@@ -94,7 +94,7 @@ int libusb_open(libusb_device *dev, libusb_device_handle **handle){
     struct libusb_device_handle *_handle;
     size_t priv_size = device_handle_priv_size();
     int r;
-    LOGD("usb_open : libusb_open - open %d.%d", dev->bus_number, dev->device_address);
+    ////LOGD("usb_open : libusb_open - open %d.%d", dev->bus_number, dev->device_address);
 
     _handle = (libusb_device_handle *) malloc(sizeof(*_handle) + priv_size);
     if (!_handle)
@@ -110,10 +110,10 @@ int libusb_open(libusb_device *dev, libusb_device_handle **handle){
     _handle->claimed_interfaces = 0;
     memset(&_handle->os_priv, 0, priv_size);
 
-    //error check111 2017-11-24
-    //r = usbi_backend.open(_handle);
+    //error check111 2017-11-24 - need debug
+    r = op_open(_handle);
     if (r < 0) {
-        LOGD("usb_open : libusb_open - open %d.%d returns %d", dev->bus_number, dev->device_address, r);
+        //LOGD("usb_open : libusb_open - open %d.%d returns %d", dev->bus_number, dev->device_address, r);
         libusb_unref_device(dev);
         usbi_mutex_destroy(&_handle->lock);
         free(_handle);
@@ -125,14 +125,28 @@ int libusb_open(libusb_device *dev, libusb_device_handle **handle){
     usbi_mutex_unlock(&ctx->open_devs_lock);
     *handle = _handle;
 
-    //error check222 2017-11-24
-    //usbi_fd_notification(ctx);
+    //error check222 2017-11-24 - need debug
+    usbi_fd_notification(ctx);
 
     return 0;
 }
 
+void libusb_free_device_list(libusb_device **list, int unref_devices) {
 
-int libusb_open_device_with_vid_pid(libusb_context *ctx, uint16_t vendor_id, uint16_t product_id) {
+    if (!list)
+        return;
+
+    if (unref_devices) {
+        int i = 0;
+        struct libusb_device *dev;
+
+        while ((dev = list[i++]) != NULL)
+            libusb_unref_device(dev);
+    }
+    free(list);
+}
+
+libusb_device_handle * libusb_open_device_with_vid_pid(libusb_context *ctx, uint16_t vendor_id, uint16_t product_id) {
 
     struct libusb_device **devs;
     struct libusb_device *found = NULL;
@@ -162,7 +176,7 @@ int libusb_open_device_with_vid_pid(libusb_context *ctx, uint16_t vendor_id, uin
     }
 
     out:
-    //error check333 2017-11-24
-    //libusb_free_device_list(devs, 1);
-    //return handle;
+    //error check333 2017-11-24 -need debug
+    libusb_free_device_list(devs, 1);
+    return handle;
 }
