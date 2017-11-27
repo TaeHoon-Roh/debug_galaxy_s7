@@ -761,6 +761,7 @@ discovered_devs_append(discovered_devs *discdevs, struct libusb_device *dev) {
     return discdevs;
 }
 
+//check
 void op_destroy_device(struct libusb_device *dev) {
 
     struct linux_device_priv *priv = _device_priv(dev);
@@ -774,6 +775,7 @@ void op_destroy_device(struct libusb_device *dev) {
         free(priv->sysfs_dir);
 }
 
+//check
 void libusb_unref_device(libusb_device *dev) {
 
     int refcnt;
@@ -807,6 +809,7 @@ int enumerate_device(libusb_context *ctx, discovered_devs **_discdevs, uint8_t b
     struct libusb_device *dev;
     int r = 0;
 
+    //merge bit
     session_id = busnum << 8 | devaddr;
 
     dev = usbi_get_device_by_session_id(ctx, session_id);

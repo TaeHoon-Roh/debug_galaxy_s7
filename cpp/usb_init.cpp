@@ -4,6 +4,8 @@
 
 #include "usb_init.h"
 
+struct libusb_context *usbi_default_context = NULL;
+
 int usbi_add_pollfd(libusb_context *ctx, int fd, short events) {
 
     struct usbi_pollfd *ipollfd = (usbi_pollfd *) malloc(sizeof(*ipollfd));

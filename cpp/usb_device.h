@@ -17,8 +17,6 @@
 #define USBI_CAP_HAS_HID_ACCESS			0x00010000
 #define USBI_CAP_SUPPORTS_DETACH_KERNEL_DRIVER	0x00020000
 
-uint32_t caps_backend = 0;
-
 enum libusb_error {
     /** Success (no error) */
             LIBUSB_SUCCESS = 0,
@@ -279,9 +277,9 @@ struct discovered_devs {
 
 #define DISCOVERED_DEVICES_SIZE_STEP 8
 
-struct libusb_context *usbi_default_context = NULL;
-
 #define USBI_GET_CONTEXT(ctx) if (!(ctx)) (ctx) = usbi_default_context
+
+extern struct libusb_context *usbi_default_context;
 
 struct usbfs_ctrltransfer {
     /* keep in sync with usbdevice_fs.h:usbdevfs_ctrltransfer */

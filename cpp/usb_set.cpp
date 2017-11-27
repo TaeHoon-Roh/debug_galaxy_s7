@@ -5,10 +5,11 @@
 #include "usb_device.h"
 #include "usbi_backend.h"
 
+uint32_t caps_backend = 0;
+
 int libusb_claim_interface(libusb_device_handle *dev, int interface_number){
 
     int r = 0;
-
     if (interface_number >= USB_MAXINTERFACES)
         return LIBUSB_ERROR_INVALID_PARAM;
 
@@ -24,6 +25,8 @@ int libusb_claim_interface(libusb_device_handle *dev, int interface_number){
     usbi_mutex_unlock(&dev->lock);
     return r;
 }
+
+
 
 int libusb_set_auto_detach_kernel_driver(libusb_device_handle *dev_handle, int enable) {
 

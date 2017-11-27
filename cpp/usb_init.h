@@ -18,7 +18,11 @@ static int default_context_refcnt = 0;
 
 int usbi_add_pollfd(libusb_context *ctx, int fd, short events);
 int usbi_mutex_init_recursive(pthread_mutex_t *mutex, pthread_mutexattr_t *attr);
-inline void list_init(list_head *entry);
+inline void list_init(list_head *entry) {
+
+    entry->prev = entry->next = entry;
+
+}
 int usbi_io_init(libusb_context *ctx);
 int libusb_init(libusb_context **context);
 

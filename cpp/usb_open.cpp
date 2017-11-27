@@ -110,7 +110,6 @@ int libusb_open(libusb_device *dev, libusb_device_handle **handle){
     _handle->claimed_interfaces = 0;
     memset(&_handle->os_priv, 0, priv_size);
 
-    //error check111 2017-11-24 - need debug
     r = op_open(_handle);
     if (r < 0) {
         //LOGD("usb_open : libusb_open - open %d.%d returns %d", dev->bus_number, dev->device_address, r);
@@ -125,7 +124,6 @@ int libusb_open(libusb_device *dev, libusb_device_handle **handle){
     usbi_mutex_unlock(&ctx->open_devs_lock);
     *handle = _handle;
 
-    //error check222 2017-11-24 - need debug
     usbi_fd_notification(ctx);
 
     return 0;
@@ -176,7 +174,6 @@ libusb_device_handle * libusb_open_device_with_vid_pid(libusb_context *ctx, uint
     }
 
     out:
-    //error check333 2017-11-24 -need debug
     libusb_free_device_list(devs, 1);
     return handle;
 }

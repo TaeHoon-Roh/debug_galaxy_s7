@@ -33,6 +33,9 @@ int op_init(struct libusb_context *ctx);
 int op_exit();
 int op_claim_interface(libusb_device_handle *handle, int iface);
 
+
+extern uint32_t caps_backend;
+
 //usb_open
 int op_get_device_list(libusb_context *ctx, discovered_devs **_discdevs);
 
