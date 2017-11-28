@@ -24,4 +24,8 @@ Usb Close
 
 list - ok
 
-usbi-backend : libusb_unref_device , op_destory_device check...
+usbi-backend  - ok
+
+
+
+Debian usb device code check ...
