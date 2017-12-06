@@ -7,7 +7,7 @@
 
 uint32_t caps_backend = 0;
 
-int libusb_claim_interface(libusb_device_handle *dev, int interface_number){
+int libusb_claim_interface(libusb_device_handle *dev, int interface_number) {
 
     int r = 0;
     if (interface_number >= USB_MAXINTERFACES)
@@ -27,7 +27,6 @@ int libusb_claim_interface(libusb_device_handle *dev, int interface_number){
 }
 
 
-
 int libusb_set_auto_detach_kernel_driver(libusb_device_handle *dev_handle, int enable) {
 
     if (!(caps_backend & USBI_CAP_SUPPORTS_DETACH_KERNEL_DRIVER))
@@ -43,4 +42,42 @@ libusb_device *libusb_ref_device(libusb_device *dev) {
     dev->refcnt++;
     usbi_mutex_unlock(&dev->lock);
     return dev;
+}
+
+int libusb_set_option(libusb_context *ctx, enum libusb_option option, ...) {
+    int arg;
+    int r = LIBUSB_SUCCESS;
+    va_list ap;
+
+    USBI_GET_CONTEXT(ctx);
+
+    va_start(ap, option);
+    switch (option) {
+        case LIBUSB_OPTION_LOG_LEVEL:
+            arg = va_arg(ap, int);
+            if (arg < LIBUSB_LOG_LEVEL_NONE || arg > LIBUSB_LOG_LEVEL_DEBUG) {
+                r = LIBUSB_ERROR_INVALID_PARAM;
+                break;
+            }
+#if defined(ENABLE_LOGGING) && !defined(ENABLE_DEBUG_LOGGING)
+        if (!ctx->debug_fixed)
+            ctx->debug = (enum libusb_log_level)arg;
+#endif
+            break;
+#if 0
+        case LIBUSB_OPTION_<...>:
+        if (usbi_backend.set_option)
+            r = usbi_backend.set_option(ctx, option, ap);
+        else
+            r = LIBUSB_ERROR_NOT_SUPPORTED;
+        break;
+#endif
+        default:
+            r = LIBUSB_ERROR_INVALID_PARAM;
+    }
+
+    va_end(ap);
+    return r;
+
+
 }

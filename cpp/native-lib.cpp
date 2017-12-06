@@ -12,6 +12,6 @@ Java_com_uxfac_koreapassing_MainActivity_stringFromJNI(
     std::string hello = "Hello from C++";
     int r;
     ssize_t cnt;
-    fxload();
+//    fxload();
     return env->NewStringUTF(hello.c_str());
 }

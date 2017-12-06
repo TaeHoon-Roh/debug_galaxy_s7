@@ -49,5 +49,7 @@ int usbi_cond_timedwait(pthread_cond_t *cond,
 
 int usbi_get_tid(void);
 
+usbi_mutex_static_t active_contexts_lock = USBI_MUTEX_INITIALIZER;
+
 
 #endif //KOREAPASSING_THREAD_H

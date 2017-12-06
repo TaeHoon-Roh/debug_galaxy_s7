@@ -5,7 +5,8 @@ add_library( # Sets the name of the library.
 
              SHARED
 
-             src/main/cpp/native-lib.cpp src/main/cpp/usb_init.cpp src/main/cpp/fxload.cpp src/main/cpp/usbi_backend.cpp src/main/cpp/usb_set.cpp src/main/cpp/usb_open.cpp)
+             src/main/cpp/native-lib.cpp src/main/cpp/usb_init.cpp src/main/cpp/fxload.cpp src/main/cpp/usbi_backend.cpp src/main/cpp/usb_set.cpp src/main/cpp/usb_open.cpp src/main/cpp/listdevs.cpp
+             src/main/cpp/usb_exit.cpp src/main/cpp/usb_core.cpp)
 
 find_library( log-lib log )
 

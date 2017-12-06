@@ -110,7 +110,6 @@ int op_init(struct libusb_context *ctx) {
         }
 
     if (supports_flag_zero_packet)
-
         r = stat(SYSFS_DEVICE_PATH, &statbuf);
     if (r == 0 && S_ISDIR(statbuf.st_mode)) {
         DIR *devices = opendir(SYSFS_DEVICE_PATH);
@@ -274,8 +273,6 @@ static struct linux_device_priv *_device_priv(struct libusb_device *dev) {
 
     return (struct linux_device_priv *) dev->os_priv;
 }
-
-#define DEVICE_CTX(dev) ((dev)->ctx)
 
 int _open_sysfs_attr(libusb_device *dev, const char *attr) {
 
@@ -1135,4 +1132,20 @@ void usbi_fd_notification(libusb_context *ctx) {
     usbi_mutex_unlock(&ctx->pollfd_modify_lock);
 
     libusb_unlock_events(ctx);
+}
+
+int get_device_list(){
+    return NULL;
+}
+
+int op_clock_gettime(int clk_id, struct timespec *tp) {
+
+    switch (clk_id) {
+        case USBI_CLOCK_MONOTONIC:
+            return clock_gettime(monotonic_clkid, tp);
+        case USBI_CLOCK_REALTIME:
+            return clock_gettime(CLOCK_REALTIME, tp);
+        default:
+            return LIBUSB_ERROR_INVALID_PARAM;
+    }
 }

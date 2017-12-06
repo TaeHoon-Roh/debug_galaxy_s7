@@ -23,6 +23,7 @@ void fxload(){
     unsigned devaddr = 0;
     unsigned _busnum;
     unsigned _devaddr;
+    int verbose = 1;
     struct libusb_device *dev, **devs;
     struct libusb_device_handle *device = NULL;
     struct libusb_device_descriptor desc;
@@ -39,6 +40,8 @@ void fxload(){
     //step 1
     status = libusb_init(NULL);
 
+    //add step 1-1
+    libusb_set_option(NULL, LIBUSB_OPTION_LOG_LEVEL, verbose);
     //step 2 fix please
     device = libusb_open_device_with_vid_pid(NULL, (uint16_t)vid,(uint16_t)pid);
 

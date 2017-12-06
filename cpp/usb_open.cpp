@@ -44,7 +44,7 @@ ssize_t libusb_get_device_list(libusb_context *ctx, libusb_device ***list) {
     r = op_get_device_list(ctx, &discdevs);
     if (r < 0) {
         len = r;
-        goto out;
+        //goto out;
     }
 
     /* convert discovered_devs into a list */
@@ -52,7 +52,7 @@ ssize_t libusb_get_device_list(libusb_context *ctx, libusb_device ***list) {
     ret = (libusb_device **) malloc(sizeof(void *) * (len + 1));
     if (!ret) {
         len = LIBUSB_ERROR_NO_MEM;
-        goto out;
+        //goto out;
     }
 
     ret[len] = NULL;
@@ -62,8 +62,8 @@ ssize_t libusb_get_device_list(libusb_context *ctx, libusb_device ***list) {
     }
     *list = ret;
 
-    out:
-    discovered_devs_free(discdevs);
+    //out: discovered_devs_free(discdevs);
+
     return len;
 }
 
@@ -110,6 +110,7 @@ int libusb_open(libusb_device *dev, libusb_device_handle **handle){
     _handle->claimed_interfaces = 0;
     memset(&_handle->os_priv, 0, priv_size);
 
+    //error
     r = op_open(_handle);
     if (r < 0) {
         //LOGD("usb_open : libusb_open - open %d.%d returns %d", dev->bus_number, dev->device_address, r);
@@ -153,9 +154,11 @@ libusb_device_handle * libusb_open_device_with_vid_pid(libusb_context *ctx, uint
     size_t i = 0;
     int r;
 
-    if (libusb_get_device_list(ctx, &devs) < 0)
+    int cnt = libusb_get_device_list(ctx,&devs);
+    if (cnt < 0)
         return NULL;
 
+    //descriptor not data
     while ((dev = devs[i++]) != NULL) {
         struct libusb_device_descriptor desc;
         r = libusb_get_device_descriptor(dev, &desc);

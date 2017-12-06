@@ -8,10 +8,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <jni.h>
-#include "usb_device.h"
 #include "thread.h"
 #include <android/log.h>
-
+#include <string.h>
+#include <errno.h>
+#include "usb_device.h"
+#include "usbi_backend.h"
+#include "usb_init.h"
 
 //Android Log
 #define  LOG_TAG    "FXLOAD"
@@ -65,11 +68,7 @@ typedef struct {
 	{ 0x04b4, 0x00f3, FX_TYPE_FX3, "Cypress FX3" },\
 }
 void fxload();
-int libusb_init(struct libusb_context **context);
-libusb_device_handle * libusb_open_device_with_vid_pid(libusb_context *ctx, uint16_t vendor_id, uint16_t product_id);
-int libusb_set_auto_detach_kernel_driver(libusb_device_handle *dev_handle, int enable);
-int libusb_claim_interface(libusb_device_handle *dev, int interface_number);
-
+int listdevs();
 
 
 #define FIRMWARE 0

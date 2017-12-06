@@ -15,10 +15,12 @@ int usbi_add_pollfd(libusb_context *ctx, int fd, short events) {
     ipollfd->pollfd.fd = fd;
     ipollfd->pollfd.events = events;
 
-    //first Error
-    //usbi_mutex_lock(&ctx->pollfds_lock);
+    //Error fix!
+    usbi_mutex_lock(&ctx->event_data_lock);
     list_add_tail(&ipollfd->list, (list_head *) &ctx->pollfds);
-    //usbi_mutex_unlock(&ctx->pollfds_lock);
+    ctx->pollfds_cnt++;
+    usbi_fd_notification(ctx);
+    usbi_mutex_unlock(&ctx->event_data_lock);
 
     ctx->fd_added_cb.fd = fd;
     ctx->fd_added_cb.events = events;
@@ -26,6 +28,31 @@ int usbi_add_pollfd(libusb_context *ctx, int fd, short events) {
     return 0;
 }
 
+void usbi_remove_pollfd(struct libusb_context *ctx, int fd) {
+
+    struct usbi_pollfd *ipollfd;
+    int found = 0;
+
+    usbi_mutex_lock(&ctx->event_data_lock);
+    list_for_each_entry(ipollfd, &ctx->ipollfds, list, struct usbi_pollfd)
+        if (ipollfd->pollfd.fd == fd) {
+            found = 1;
+            break;
+        }
+
+    if (!found) {
+        usbi_mutex_unlock(&ctx->event_data_lock);
+        return;
+    }
+
+    list_del(&ipollfd->list);
+    ctx->pollfds_cnt--;
+    usbi_fd_notification(ctx);
+    usbi_mutex_unlock(&ctx->event_data_lock);
+    free(ipollfd);
+
+    ctx->fd_removed_cb.fd = fd;
+}
 
 int usbi_mutex_init_recursive(pthread_mutex_t *mutex, pthread_mutexattr_t *attr) {
 
@@ -160,3 +187,5 @@ int libusb_init(libusb_context **context) {
     usbi_mutex_static_unlock(&default_context_lock);
     return r;
 }
+
+

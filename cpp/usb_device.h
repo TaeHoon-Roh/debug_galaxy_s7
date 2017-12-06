@@ -9,13 +9,13 @@
 #include "thread.h"
 #include <sys/poll.h>
 
-#define USB_MAXENDPOINTS	32
-#define USB_MAXINTERFACES	32
-#define USB_MAXCONFIG		8
+#define USB_MAXENDPOINTS    32
+#define USB_MAXINTERFACES    32
+#define USB_MAXCONFIG        8
 
 /* Backend specific capabilities */
-#define USBI_CAP_HAS_HID_ACCESS			0x00010000
-#define USBI_CAP_SUPPORTS_DETACH_KERNEL_DRIVER	0x00020000
+#define USBI_CAP_HAS_HID_ACCESS            0x00010000
+#define USBI_CAP_SUPPORTS_DETACH_KERNEL_DRIVER    0x00020000
 
 enum libusb_error {
     /** Success (no error) */
@@ -198,11 +198,13 @@ enum {
     USBI_CLOCK_REALTIME
 };
 
+#define POLL_NFDS_TYPE unsigned int
 
 struct libusb_context {
     int debug;
     int debug_fixed;
 
+    //event_pipe[]
     int ctrl_pipe[2];
 
     struct list_head usb_devs;
@@ -240,6 +242,7 @@ struct libusb_context {
 
     unsigned int pollfd_modify;
     usbi_mutex_t pollfd_modify_lock;
+    POLL_NFDS_TYPE pollfds_cnt;
 
     struct list_head hotplug_msgs;
 
@@ -252,7 +255,7 @@ struct libusb_context {
     struct list_head list;
 
     struct pollfd fd_added_cb;
-    struct pollfd fd_removed_db;
+    struct pollfd fd_removed_cb;
 
 };
 
@@ -283,13 +286,13 @@ extern struct libusb_context *usbi_default_context;
 
 struct usbfs_ctrltransfer {
     /* keep in sync with usbdevice_fs.h:usbdevfs_ctrltransfer */
-    uint8_t  bmRequestType;
-    uint8_t  bRequest;
+    uint8_t bmRequestType;
+    uint8_t bRequest;
     uint16_t wValue;
     uint16_t wIndex;
     uint16_t wLength;
 
-    uint32_t timeout;	/* in milliseconds */
+    uint32_t timeout;    /* in milliseconds */
 
     /* pointer to data */
     void *data;
@@ -342,25 +345,25 @@ enum libusb_standard_request {
             LIBUSB_REQUEST_SYNCH_FRAME = 0x0C,
 };
 
-#define IOCTL_USBFS_CONTROL	_IOWR('U', 0, usbfs_ctrltransfer)
+#define IOCTL_USBFS_CONTROL    _IOWR('U', 0, usbfs_ctrltransfer)
 
 struct libusb_config_descriptor {
 
-    uint8_t  bLength;
+    uint8_t bLength;
 
-    uint8_t  bDescriptorType;
+    uint8_t bDescriptorType;
 
     uint16_t wTotalLength;
 
-    uint8_t  bNumInterfaces;
+    uint8_t bNumInterfaces;
 
-    uint8_t  bConfigurationValue;
+    uint8_t bConfigurationValue;
 
-    uint8_t  iConfiguration;
+    uint8_t iConfiguration;
 
-    uint8_t  bmAttributes;
+    uint8_t bmAttributes;
 
-    uint8_t  MaxPower;
+    uint8_t MaxPower;
 
     const struct libusb_interface *interface;
 
@@ -372,7 +375,7 @@ struct libusb_config_descriptor {
 inline uint16_t libusb_cpu_to_le16(const uint16_t x) {
 
     union {
-        uint8_t  b8[2];
+        uint8_t b8[2];
         uint16_t b16;
     } _tmp;
     _tmp.b8[1] = x >> 8;
@@ -381,7 +384,32 @@ inline uint16_t libusb_cpu_to_le16(const uint16_t x) {
 }
 
 
-
 #define libusb_le16_to_cpu libusb_cpu_to_le16
+
+enum libusb_option {
+    LIBUSB_OPTION_LOG_LEVEL,
+};
+
+enum libusb_capability {
+    LIBUSB_CAP_HAS_CAPABILITY = 0x0000,
+    LIBUSB_CAP_HAS_HOTPLUG = 0x0001,
+    LIBUSB_CAP_HAS_HID_ACCESS = 0x0100,
+    LIBUSB_CAP_SUPPORTS_DETACH_KERNEL_DRIVER = 0x0101
+};
+
+enum libusb_log_level {
+    LIBUSB_LOG_LEVEL_NONE = 0,
+    LIBUSB_LOG_LEVEL_ERROR,
+    LIBUSB_LOG_LEVEL_WARNING,
+    LIBUSB_LOG_LEVEL_INFO,
+    LIBUSB_LOG_LEVEL_DEBUG,
+};
+
+
+int libusb_set_option(libusb_context *ctx, enum libusb_option option, ...);
+
+ssize_t libusb_get_device_list(libusb_context *ctx, libusb_device ***list);
+
+void libusb_free_device_list(libusb_device **list, int unref_devices);
 
 #endif //KOREAPASSING_USB_DEVICE_H
